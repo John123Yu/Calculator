@@ -1,6 +1,13 @@
-export enum ServiceFields {
-  ONE = "one",
-  TWO = "two",
+export enum RouteFields {
+  POST = "/posts",
+  POSTSLIST = "/posts/list",
+}
+
+enum Methods {
+  GET = "GET",
+  POST = "POST",
+  PUT = "PUT",
+  DELETE = "DELETE",
 }
 
 export interface SearchParams {
@@ -8,34 +15,31 @@ export interface SearchParams {
 }
 
 export interface DataServiceType {
-  getData: (service: ServiceFields, params?: SearchParams) => Promise<any>;
+  getData: (
+    route: RouteFields,
+    method: Methods,
+    params?: SearchParams
+  ) => Promise<any>;
 }
 
 export class DataService implements DataServiceType {
-  public type: any;
+  public url: string =
+    "https://cqyfyqxt6j.execute-api.us-east-1.amazonaws.com/prod/";
 
-  setType = (t: any) => {
-    this.type = t;
-  };
+  getData = async (
+    route: RouteFields,
+    method: Methods,
+    params?: SearchParams
+  ) => {
+    // let token = localStorage.getItem("token");
+    let headers = {
+      ...params,
+      Accept: "application/json",
+    };
 
-  getData = async (service: ServiceFields, params?: SearchParams) => {
-    let token = localStorage.getItem("token");
-    let query = `?filter=${this.type.toLocaleLowerCase()}&`;
-
-    if (params) {
-      query += Object.keys(params)
-        .map(
-          (k: string) =>
-            encodeURIComponent(k) + "=" + encodeURIComponent(params[k])
-        )
-        .join("&");
-    }
-    const response = await fetch(`/api/${service}${query}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+    const response = await fetch(`${this.url}${route}`, {
+      method,
+      headers,
     });
 
     return await response.json();
@@ -43,7 +47,6 @@ export class DataService implements DataServiceType {
 }
 
 export const DataServiceMock: DataService = {
-  type: "ContentType.ALL",
+  url: "fakeUrl",
   getData: () => Promise.resolve({}),
-  setType: () => {},
 };
