@@ -17,7 +17,7 @@ export function App(props: Props) {
 
   return (
     <Router>
-      <HomePage path="/abc" />
+      <HomePage path="/" />
     </Router>
   );
 }
